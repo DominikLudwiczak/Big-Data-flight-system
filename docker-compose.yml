@@ -1,0 +1,97 @@
+version: "3.3"
+
+networks:
+  cassandra-flight-net:
+    driver: bridge
+
+services:
+
+  cassandra-flight-1:
+    image: "cassandra:latest"
+    container_name: "cassandra-flight-1"
+    ports:
+      - 7000:7000
+      - 9042:9042
+    networks:
+      - cassandra-flight-net
+    environment:
+      - CASSANDRA_CLUSTER_NAME=my-cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=flight-datacenter
+    volumes:
+      - cassandra-flight-node-1:/var/lib/cassandra:rw
+    restart:
+      on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status"]
+      interval: 2m
+      start_period: 2m
+      timeout: 10s
+      retries: 3
+
+  cassandra-flight-2:
+    image: "cassandra:latest"
+    container_name: "cassandra-flight-2"
+    ports:
+      - 9043:9042
+    networks:
+      - cassandra-flight-net
+    environment:
+      - CASSANDRA_CLUSTER_NAME=my-cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=flight-datacenter
+      - CASSANDRA_SEEDS=cassandra-flight-1
+    depends_on:
+      cassandra-flight-1:
+        condition: service_healthy
+    volumes:
+      - cassandra-flight-node-2:/var/lib/cassandra:rw
+    restart:
+      on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status"]
+      interval: 2m
+      start_period: 2m
+      timeout: 10s
+      retries: 3
+
+  cassandra-flight-3:
+    image: "cassandra:latest"
+    container_name: "cassandra-flight-3"
+    ports:
+      - 9044:9042
+    networks:
+      - cassandra-flight-net
+    environment:
+      - CASSANDRA_CLUSTER_NAME=my-cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=flight-datacenter
+      - CASSANDRA_SEEDS=cassandra-flight-1
+    depends_on:
+      cassandra-flight-2:
+        condition: service_healthy
+    volumes:
+      - cassandra-flight-node-3:/var/lib/cassandra:rw
+    restart:
+      on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status"]
+      interval: 2m
+      start_period: 2m
+      timeout: 10s
+      retries: 3
+  init:
+    image: cassandra:latest
+    depends_on:
+      cassandra-flight-3:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: ["/init.sh"]
+    volumes:
+      - ./init.sh:/init.sh
+
+volumes:
+  cassandra-flight-node-1:
+  cassandra-flight-node-2:
+  cassandra-flight-node-3:
+  init:
