@@ -5,7 +5,6 @@ networks:
     driver: bridge
 
 services:
-
   cassandra-flight-1:
     image: "cassandra:latest"
     container_name: "cassandra-flight-1"
@@ -15,17 +14,18 @@ services:
     networks:
       - cassandra-flight-net
     environment:
-      - CASSANDRA_CLUSTER_NAME=my-cluster
+      - CASSANDRA_CLUSTER_NAME=flights-cluster
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=flight-datacenter
+      - CASSANDRA_RACK=flight-rack1
     volumes:
-      - cassandra-flight-node-1:/var/lib/cassandra:rw
+      - ./cassandra-flight-node-1:/var/lib/cassandra:rw
     restart:
       on-failure
     healthcheck:
       test: ["CMD-SHELL", "nodetool status"]
-      interval: 2m
-      start_period: 2m
+      interval: 1m
+      start_period: 1m
       timeout: 10s
       retries: 3
 
@@ -37,21 +37,22 @@ services:
     networks:
       - cassandra-flight-net
     environment:
-      - CASSANDRA_CLUSTER_NAME=my-cluster
+      - CASSANDRA_CLUSTER_NAME=flights-cluster
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=flight-datacenter
+      - CASSANDRA_RACK=flight-rack1
       - CASSANDRA_SEEDS=cassandra-flight-1
     depends_on:
       cassandra-flight-1:
         condition: service_healthy
     volumes:
-      - cassandra-flight-node-2:/var/lib/cassandra:rw
+      - ./cassandra-flight-node-2:/var/lib/cassandra:rw
     restart:
       on-failure
     healthcheck:
       test: ["CMD-SHELL", "nodetool status"]
-      interval: 2m
-      start_period: 2m
+      interval: 1m
+      start_period: 1m
       timeout: 10s
       retries: 3
 
@@ -63,36 +64,27 @@ services:
     networks:
       - cassandra-flight-net
     environment:
-      - CASSANDRA_CLUSTER_NAME=my-cluster
+      - CASSANDRA_CLUSTER_NAME=flights-cluster
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=flight-datacenter
+      - CASSANDRA_RACK=flight-rack1
       - CASSANDRA_SEEDS=cassandra-flight-1
     depends_on:
       cassandra-flight-2:
         condition: service_healthy
-    volumes:
-      - cassandra-flight-node-3:/var/lib/cassandra:rw
+    volumes: 
+      - ./cassandra-flight-node-3:/var/lib/cassandra:rw
     restart:
       on-failure
     healthcheck:
       test: ["CMD-SHELL", "nodetool status"]
-      interval: 2m
-      start_period: 2m
+      interval: 1m
+      start_period: 1m
       timeout: 10s
       retries: 3
-  init:
-    build:
-      context: .
-      dockerfile: dockerfile.init
-    depends_on:
-      cassandra-flight-3:
-        condition: service_healthy
-    restart: "no"
-    volumes:
-      - ./init.sh:/init.sh
 
 volumes:
   cassandra-flight-node-1:
   cassandra-flight-node-2:
   cassandra-flight-node-3:
-  init:
+  
