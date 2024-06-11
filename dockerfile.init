@@ -1,0 +1,7 @@
+FROM cassandra:latest
+RUN apt-get update && apt-get install -y python3-pip
+RUN pip3 install cassandra-driver
+COPY init.sh /init.sh
+RUN chmod +x /init.sh
+
+ENTRYPOINT ["/init.sh"]

@@ -81,12 +81,13 @@ services:
       timeout: 10s
       retries: 3
   init:
-    image: cassandra:latest
+    build:
+      context: .
+      dockerfile: dockerfile.init
     depends_on:
       cassandra-flight-3:
         condition: service_healthy
     restart: "no"
-    entrypoint: ["/init.sh"]
     volumes:
       - ./init.sh:/init.sh
 

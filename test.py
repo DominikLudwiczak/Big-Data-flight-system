@@ -13,7 +13,7 @@ session = cluster.connect('flights')
 
 class CassandraTests(unittest.TestCase):
     def test_connect(self):
-        self.assertEqual(session.keyspace, 'flights')
+        self.assertEqual(session.keyspace, 'flights_system')
         
         
 
