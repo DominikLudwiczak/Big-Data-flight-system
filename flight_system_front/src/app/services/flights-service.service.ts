@@ -13,7 +13,7 @@ export class FlightsServiceService {
 
   constructor(private httpClinet: HttpClient) { }
 
-  getFlights(): Observable<Flight[]> {
-    return this.httpClinet.get<Flight[]>(`${API_URL}/flights`);
+  getFlights(): Observable<any> {
+    return this.httpClinet.get<any>(`${API_URL}/flights`);
   }
 }

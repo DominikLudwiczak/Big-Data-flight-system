@@ -10,6 +10,8 @@ import { MainComponent } from './page/main/main.component';
 import { FlightsComponent } from './page/flights/flights.component';
 import { SearchFlightComponent } from './page/search-flight/search-flight.component';
 import { FlightComponent } from './page/flights/flight/flight.component';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './interceptors/interceptor';
 
 @NgModule({
   declarations: [
@@ -25,8 +27,16 @@ import { FlightComponent } from './page/flights/flight/flight.component';
     SharedModule,
     BrowserAnimationsModule,
     MaterialsModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+      deps: []
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

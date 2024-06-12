@@ -8,7 +8,7 @@ class BookController:
     def __init__(self):
         self.BookingService = BookingService()
 
-    @router.get()
+    @router.get("/")
     def getAllBooks(self):
         return self.BookingService.getAllBooks()
 
@@ -16,7 +16,7 @@ class BookController:
     def getBook(self, bookId: uuid.UUID):
         return self.BookingService.getBook(bookId)
 
-    @router.post()
+    @router.post("/")
     def addBook(self, title: str, author: str, year: int, pages: int):
         self.BookingService.addBook(title, author, year, pages)
 
