@@ -1,2 +1,9 @@
+<<<<<<< HEAD
 *.pyc
 *.log
+=======
+__pycache__
+cassandra-flight-node-1
+cassandra-flight-node-2
+cassandra-flight-node-3
+>>>>>>> d90432fd4ae0c6b474d3b55cbe9061ea8326d559
