@@ -1,4 +1,3 @@
-from datetime import datetime
 from connect import session
 import uuid
 
@@ -65,7 +64,7 @@ class BookingService:
         available_seats_query = f"SELECT booked_seats, capacity FROM flights WHERE flight_id = {flight_id}"
         result = session.execute(available_seats_query)
         row = result.one()
-        booked_seats = row.booked_seats if row else set()
+        booked_seats = row.booked_seats if row and row.booked_seats else set()
         capacity = row.capacity if row else 0
 
         if capacity - num_seats < 0:
@@ -89,13 +88,12 @@ class BookingService:
                 selected_seats = set(seats[i:i + num_seats])
                 if not selected_seats & booked_seats:
                     booking_ids = [uuid.uuid4() for _ in range(num_seats)]
-                    for booking_id, seat, passenger_name in zip(booking_ids, selected_seats, passenger_names):
-                        session.execute(insert_booking_query, (booking_id, passenger_name, seat))
-
                     updated_booked_seats = booked_seats.union(selected_seats)
                     capacity -= len(selected_seats)
-                    booked_seats_str = "{" + ', '.join(map(lambda x: f"'{x}'", updated_booked_seats)) + "}"
                     session.execute(update_flight_query, (updated_booked_seats, capacity))
+
+                    for booking_id, seat, passenger_name in zip(booking_ids, selected_seats, passenger_names):
+                        session.execute(insert_booking_query, (booking_id, passenger_name, seat))
 
                     return True, list(selected_seats)
         
@@ -108,11 +106,11 @@ class BookingService:
                 if seat not in booked_seats:
                     print(seat)
                     booking_id = uuid.uuid4()
-                    passenger_name = passenger_names.pop(0)
-                    session.execute(insert_booking_query, (booking_id, passenger_name, seat))
                     booked_seats = booked_seats.union({seat})
                     capacity -= 1
                     session.execute(update_flight_query, (booked_seats, capacity))
+                    passenger_name = passenger_names.pop(0)
+                    session.execute(insert_booking_query, (booking_id, passenger_name, seat))
 
         return False, None
 
@@ -136,17 +134,27 @@ class BookingService:
         return True, f"Booking {booking_id} removed, seat {seat_number} freed"
 
     def updateBooking(self, booking_id, flight_id):
-        flights_query = f"SELECT * from flights WHERE booking_id = {booking_id}"
-        result = session.execute()
+        booking_query = f"SELECT flight_id, passenger_name, seat_number FROM bookings WHERE booking_id = {booking_id}"
+        result = session.execute(booking_query).one()
+
         if not result:
             return False, "Booking not found"
-        
-        row = result.one()
-        seat_number = row.seat_number
-        
-        update_booking_query = f"UPDATE bookings SET flight_id = {flight_id} WHERE booking_id = {booking_id}"
-        session.execute(update_booking_query)
-        
+
+        old_flight_id = result.flight_id
+        passenger_name = result.passenger_name
+        seat_number = result.seat_number
+
+        result = self.addBooking(flight_id, 1, [passenger_name])
+        if not result:
+            revert_query = f"UPDATE flights SET booked_seats = booked_seats - {{'{seat_number}'}} WHERE flight_id = {flight_id}"
+            session.execute(revert_query)
+            return False, "No seats left on selected flight"
+
+        self.deleteBooking(booking_id)
+
+        update_old_flight_query = f"UPDATE flights SET booked_seats = booked_seats - {{'{seat_number}'}} WHERE flight_id = {old_flight_id}"
+        session.execute(update_old_flight_query)
+
         return True, f"Booking {booking_id} updated to flight {flight_id}"
 
     def getAllBookingsById(self, flight_id):
