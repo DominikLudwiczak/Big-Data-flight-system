@@ -1,8 +1,9 @@
+from connect import Connect
 import uuid
 
 class Init:
-    def __init__(self, conn):
-        self.conn = conn
+    def __init__(self):
+        self.conn = Connect()
 
     def init(self, keyspace_name):
         cluster = self.conn.get_cluster()
@@ -13,9 +14,13 @@ class Init:
             print(f'Created {keyspace_name} keyspace')
         self.conn.connect(keyspace_name)
         print(f'Connected to {keyspace_name} keyspace')
+        self.create_tables()
+        self.seed_data()
+
+
 
     def create_keyspace(self, keyspace_name='flights_system'):
-        query = f"CREATE KEYSPACE IF NOT EXISTS {keyspace_name} WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};"
+        query = f"CREATE KEYSPACE IF NOT EXISTS {keyspace_name}" + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '2'};"
         self.conn.execute(query)
 
     def create_tables(self):

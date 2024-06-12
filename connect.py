@@ -4,13 +4,7 @@ from cassandra.query import BatchStatement
 
 class Connect:
     def __init__(self):
-        self.cluster = Cluster(
-            contact_points=[
-            ('127.0.0.1', 9042),
-            ('127.0.0.1', 9043),
-            ('127.0.0.1', 9044)
-            ]
-        )
+        self.cluster = Cluster(['127.0.0.1'])
         self.connect('flights_system')
 
     def connect(self, keyspace_name):

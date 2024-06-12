@@ -1,90 +1,61 @@
-version: "3.3"
-
 networks:
-  cassandra-flight-net:
-    driver: bridge
+  flight-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.16.0/20
+          gateway: 192.168.16.1
 
 services:
-  cassandra-flight-1:
+  flight-1:
     image: "cassandra:latest"
-    container_name: "cassandra-flight-1"
+    container_name: "flight-1"
     ports:
-      - 7000:7000
       - 9042:9042
     networks:
-      - cassandra-flight-net
+      flight-net:
+        ipv4_address: 192.168.16.2
     environment:
       - CASSANDRA_CLUSTER_NAME=flights-cluster
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=flight-datacenter
       - CASSANDRA_RACK=flight-rack1
+      - CASSANDRA_SEEDS=flight-1
     volumes:
-      - ./cassandra-flight-node-1:/var/lib/cassandra:rw
+      - ./flight-node-1:/var/lib/cassandra:rw
     restart:
       on-failure
     healthcheck:
       test: ["CMD-SHELL", "nodetool status"]
-      interval: 1m
-      start_period: 1m
+      interval: 30s
+      start_period: 30s
       timeout: 10s
       retries: 3
 
-  cassandra-flight-2:
+  flight-2:
     image: "cassandra:latest"
-    container_name: "cassandra-flight-2"
+    container_name: "flight-2"
     ports:
       - 9043:9042
     networks:
-      - cassandra-flight-net
+      flight-net:
+        ipv4_address: 192.168.16.3
     environment:
       - CASSANDRA_CLUSTER_NAME=flights-cluster
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=flight-datacenter
       - CASSANDRA_RACK=flight-rack1
-      - CASSANDRA_SEEDS=cassandra-flight-1
+      - CASSANDRA_SEEDS=flight-1
     depends_on:
-      cassandra-flight-1:
+      flight-1:
         condition: service_healthy
     volumes:
-      - ./cassandra-flight-node-2:/var/lib/cassandra:rw
+      - ./flight-node-2:/var/lib/cassandra:rw
     restart:
       on-failure
     healthcheck:
       test: ["CMD-SHELL", "nodetool status"]
-      interval: 1m
-      start_period: 1m
+      interval: 30s
+      start_period: 30s
       timeout: 10s
       retries: 3
-
-  cassandra-flight-3:
-    image: "cassandra:latest"
-    container_name: "cassandra-flight-3"
-    ports:
-      - 9044:9042
-    networks:
-      - cassandra-flight-net
-    environment:
-      - CASSANDRA_CLUSTER_NAME=flights-cluster
-      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
-      - CASSANDRA_DC=flight-datacenter
-      - CASSANDRA_RACK=flight-rack1
-      - CASSANDRA_SEEDS=cassandra-flight-1
-    depends_on:
-      cassandra-flight-2:
-        condition: service_healthy
-    volumes: 
-      - ./cassandra-flight-node-3:/var/lib/cassandra:rw
-    restart:
-      on-failure
-    healthcheck:
-      test: ["CMD-SHELL", "nodetool status"]
-      interval: 1m
-      start_period: 1m
-      timeout: 10s
-      retries: 3
-
-volumes:
-  cassandra-flight-node-1:
-  cassandra-flight-node-2:
-  cassandra-flight-node-3:
-  

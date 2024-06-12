@@ -1,12 +1,13 @@
 from init import Init
-from connect import Connect
+from fastapi import FastAPI
 
-conn = Connect()
+app = FastAPI()
 
-init = Init(conn)
-init.init('flights_system')
+@app.on_event("startup")
+def startup_event():
+    init = Init()
+    init.init('flights_system')
 
-init.create_tables()
-init.seed_data()
-
-conn.close()
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
