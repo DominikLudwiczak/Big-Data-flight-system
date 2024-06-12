@@ -1,9 +1,8 @@
-from connect import Connect
 import uuid
 
 class Init:
-    def __init__(self):
-        self.conn = Connect()
+    def __init__(self, conn):
+        self.conn = conn
 
     def init(self, keyspace_name):
         cluster = self.conn.get_cluster()
