@@ -1,3 +1,5 @@
+*.pyc
+*.log
 __pycache__
 flight-node-1
 flight-node-2
