@@ -27,7 +27,7 @@ class BookingService:
                         WHERE flight_id = {flight_id}
                     """)
 
-        for row_num in range(1, 3):
+        for row_num in range(1, 31):
             seats = [f"{row_num}{seat}" for seat in "ABCDEF"]
             for i in range(len(seats) - num_seats + 1):
                 selected_seats = set(seats[i:i + num_seats])
@@ -46,7 +46,7 @@ class BookingService:
                     return True, list(selected_seats)
         
         # if seats next to each other not avaliable give free seats from each row untill num_seats are provided
-        for row_num in range(1, 3):
+        for row_num in range(1, 31):
             seats = [f"{row_num}{seat}" for seat in "ABCDEF"]
             for seat in seats:
                 if capacity == 0 or not passenger_names:
@@ -104,7 +104,7 @@ class BookingService:
 
         return True, f"Booking {booking_id} updated to flight {flight_id}"
 
-    def getAllBookingsById(self, flight_id):
+    def getAllBookingsByFlightId(self, flight_id):
         result_set = session.execute(f"SELECT * FROM bookings WHERE flight_id = {flight_id}")
         bookings = []
         for row in result_set:
@@ -117,3 +117,10 @@ class BookingService:
         if not result:
             return False, None
         return True, Booking.to_json(result.flight_id, result.booking_id, result.passenger_name, result.seat_number)
+    
+    def getAllBookings(self):
+        result_set = session.execute("SELECT * FROM bookings")
+        bookings = []
+        for row in result_set:
+            bookings.append(Booking.to_json(row.flight_id, row.booking_id, row.passenger_name, row.seat_number))
+        return True, bookings

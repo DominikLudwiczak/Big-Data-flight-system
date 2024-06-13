@@ -8,7 +8,7 @@ service = BookingService()
 
 @router.get("/{flightId}")
 def getAllBookingsByFlightId(flightId: uuid.UUID):
-    return service.getAllBookingsById(flightId)
+    return service.getAllBookingsByFlightId(flightId)
 
 @router.post("/")
 def addBooking(flight_id: uuid.UUID, num_seats: int, passenger_names: list[str]):
@@ -21,3 +21,7 @@ def deleteBooking(bookId: uuid.UUID):
 @router.put("/{bookId}")
 def updateBooking(bookingId: uuid.UUID, flightId: uuid.UUID):
     service.updateBooking(bookingId, flightId)
+
+@router.get("/")
+def getAllBookings():
+    return service.getAllBookings()
