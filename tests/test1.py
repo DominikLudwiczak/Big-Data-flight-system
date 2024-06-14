@@ -3,7 +3,7 @@ from locust import HttpUser, task, between, events
 class StressTestUser(HttpUser):
     wait_time = between(0, 0)
     host = "http://localhost:8000"
-    
+
     @task(1)
     def get_all_bookings(self):
         self.client.get("/bookings")

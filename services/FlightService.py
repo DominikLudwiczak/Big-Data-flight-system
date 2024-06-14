@@ -27,14 +27,12 @@ class FlightService:
         return flights
 
     def addFlight(self, departure_airport, arrival_airport, departure_time, arrival_time):
-        arrival_date = datetime.strptime(arrival_time, '%Y-%m-%d %H:%M')
-        departure_date = datetime.strptime(departure_time, '%Y-%m-%d %H:%M')
 
         insert_query = session.prepare("""
             INSERT INTO flights (flight_id, departure_airport, arrival_airport, departure_time, arrival_time, capacity, booked_seats)
             VALUES (uuid(), ?, ?, ?, ?, 180, ?)
         """)
-        session.execute(insert_query, (departure_airport, arrival_airport, departure_date, arrival_date, set()))
+        session.execute(insert_query, (departure_airport, arrival_airport, departure_time, arrival_time, set()))
 
     def deleteFlight(self, flightId):
         # Step 1: Delete flight record from 'flights' table

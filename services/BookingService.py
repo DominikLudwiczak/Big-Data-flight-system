@@ -6,6 +6,7 @@ import uuid
 class BookingService:
 
     def addBooking(self, flight_id, num_seats, passenger_names):
+        starting_len = len(passenger_names)
         available_seats_query = f"SELECT booked_seats, capacity FROM flights WHERE flight_id = {flight_id}"
         result = session.execute(available_seats_query)
         row = result.one()
@@ -44,7 +45,8 @@ class BookingService:
                         session.execute(insert_booking_query, (booking_id, passenger_name, seat))
 
                     return True, list(selected_seats)
-        
+                
+        given_seats = []
         # if seats next to each other not avaliable give free seats from each row untill num_seats are provided
         for row_num in range(1, 31):
             seats = [f"{row_num}{seat}" for seat in "ABCDEF"]
@@ -60,6 +62,9 @@ class BookingService:
                     session.execute(update_flight_query, (booked_seats, capacity))
                     passenger_name = passenger_names.pop(0)
                     session.execute(insert_booking_query, (booking_id, passenger_name, seat))
+                    given_seats.append(seat)
+        if len(passenger_names < starting_len):
+            return True, given_seats
 
         return False, None
 
@@ -124,3 +129,18 @@ class BookingService:
         for row in result_set:
             bookings.append(Booking.to_json(row.flight_id, row.booking_id, row.passenger_name, row.seat_number))
         return True, bookings
+    
+    def addSeatedBooking(self, booking):
+        select_query = f"SELECT capacity, booked_seats FROM flights WHERE flight_id = {booking.flight_id}"
+        result = session.execute(select_query).one()
+        if not result:
+            return False, "Flight not found"
+        if booking.seat_number in result.booked_seats:
+            return False, "Seat already booked"
+        
+        insert_query = session.prepare("""
+            INSERT INTO bookings (booking_id, flight_id, passenger_name, seat_number)
+            VALUES (?, ?, ?, ?)
+        """)
+        session.execute(insert_query, (booking.booking_id, booking.flight_id, booking.passenger_name, booking.seat_number))
+        return True, f"Booking {booking.booking_id} added"
