@@ -63,7 +63,7 @@ class BookingService:
                     passenger_name = passenger_names.pop(0)
                     session.execute(insert_booking_query, (booking_id, passenger_name, seat))
                     given_seats.append(seat)
-        if len(passenger_names < starting_len):
+        if len(passenger_names) < starting_len:
             return given_seats
 
         return None
@@ -97,9 +97,7 @@ class BookingService:
         if not result:
             return "Booking not found"
 
-        old_flight_id = result.flight_id
         passenger_name = result.passenger_name
-        seat_number = result.seat_number
 
         result = self.addBooking(flight_id, 1, [passenger_name])
         if not result:
@@ -135,7 +133,7 @@ class BookingService:
         result = session.execute(select_query).one()
         if not result:
             return "Flight not found"
-        if booking.seat_number in result.booked_seats:
+        if result.booked_seats and booking.seat_number in result.booked_seats:
             return "Seat already booked"
         
         flight_insert_query = f"UPDATE flights SET booked_seats = booked_seats + {{'{booking.seat_number}'}}, capacity = {result.capacity - 1} WHERE flight_id = {booking.flight_id}"

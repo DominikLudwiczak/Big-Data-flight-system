@@ -10,4 +10,4 @@ class StressTestUser(HttpUser):
 
 if __name__ == "__main__":
     import os
-    os.system("locust -f test1.py --headless -u 1 -r 1 --run-time 1m")
+    os.system("locust -f test1.py --headless -u 1 -r 1 --run-time 10m")
