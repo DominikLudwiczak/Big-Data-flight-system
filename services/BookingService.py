@@ -138,6 +138,9 @@ class BookingService:
         if booking.seat_number in result.booked_seats:
             return "Seat already booked"
         
+        flight_insert_query = f"UPDATE flights SET booked_seats = booked_seats + {{'{booking.seat_number}'}}, capacity = {result.capacity - 1} WHERE flight_id = {booking.flight_id}"
+        session.execute(flight_insert_query)
+        
         insert_query = session.prepare("""
             INSERT INTO bookings (booking_id, flight_id, passenger_name, seat_number)
             VALUES (?, ?, ?, ?)
