@@ -14,7 +14,7 @@ class BookingService:
         capacity = row.capacity if row else 0
 
         if capacity - num_seats < 0:
-            return False, None
+            return None
         
         insert_booking_query = session.prepare(f"""
                             INSERT INTO bookings (booking_id, flight_id, passenger_name, seat_number)
@@ -44,7 +44,7 @@ class BookingService:
                     for booking_id, seat, passenger_name in zip(booking_ids, selected_seats, passenger_names):
                         session.execute(insert_booking_query, (booking_id, passenger_name, seat))
 
-                    return True, list(selected_seats)
+                    return list(selected_seats)
                 
         given_seats = []
         # if seats next to each other not avaliable give free seats from each row untill num_seats are provided
@@ -63,7 +63,7 @@ class BookingService:
                     session.execute(insert_booking_query, (booking_id, passenger_name, seat))
                     given_seats.append(seat)
         if len(passenger_names < starting_len):
-            return True, given_seats
+            return given_seats
 
         return None
 
@@ -113,32 +113,33 @@ class BookingService:
         bookings = []
         for row in result_set:
             bookings.append(Booking.to_json(row.flight_id, row.booking_id, row.passenger_name, row.seat_number))
+         
         return bookings
     
     def getBookingById(self, booking_id):
         result = session.execute(f"SELECT * FROM bookings WHERE booking_id = {booking_id}").one()
         if not result:
-            return False, None
-        return True, Booking.to_json(result.flight_id, result.booking_id, result.passenger_name, result.seat_number)
+            return None
+        return Booking.to_json(result.flight_id, result.booking_id, result.passenger_name, result.seat_number)
     
     def getAllBookings(self):
         result_set = session.execute("SELECT * FROM bookings")
         bookings = []
         for row in result_set:
             bookings.append(Booking.to_json(row.flight_id, row.booking_id, row.passenger_name, row.seat_number))
-        return True, bookings
+        return bookings
     
     def addSeatedBooking(self, booking):
         select_query = f"SELECT capacity, booked_seats FROM flights WHERE flight_id = {booking.flight_id}"
         result = session.execute(select_query).one()
         if not result:
-            return False, "Flight not found"
+            return "Flight not found"
         if booking.seat_number in result.booked_seats:
-            return False, "Seat already booked"
+            return "Seat already booked"
         
         insert_query = session.prepare("""
             INSERT INTO bookings (booking_id, flight_id, passenger_name, seat_number)
             VALUES (?, ?, ?, ?)
         """)
         session.execute(insert_query, (booking.booking_id, booking.flight_id, booking.passenger_name, booking.seat_number))
-        return True, f"Booking {booking.booking_id} added"
+        return f"Booking {booking.booking_id} added"
