@@ -74,7 +74,18 @@ export class AddBookingComponent implements OnInit {
 
   addBooking() {
     if (this.bookingForm.valid) {
-      this.bookingService.addBooking(this.bookingForm.value as AddBooking).subscribe(
+      let newBookig: AddBooking[] = [];
+
+      for (let i = 0; i < this.passengerNames.value.length; i++) {
+        newBookig.push({
+          flight_id: this.bookingForm.get('flight_id')?.value,
+          booking_id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          seat_number: '1A',
+          passenger_name: this.passengerNames.value[i]
+        });
+      }
+
+      this.bookingService.addBooking(newBookig).subscribe(
         (data) => {
           this.router.navigate(['/panel/bookings/flight', this.bookingForm.get('flight_id')?.value]);
         },

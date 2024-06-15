@@ -24,5 +24,5 @@ class Flight(BaseModel):
             "departure_time": departure_time,
             "arrival_time": arrival_time,
             "capacity": capacity,
-            "booked_seats": list(booked_seats)
+            "booked_seats": list(booked_seats) if booked_seats else []
         }

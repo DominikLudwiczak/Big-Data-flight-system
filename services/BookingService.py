@@ -134,7 +134,7 @@ class BookingService:
         result = session.execute(select_query).one()
         if not result:
             return "Flight not found"
-        if booking.seat_number in result.booked_seats:
+        if result.booked_seats and booking.seat_number in result.booked_seats:
             return "Seat already booked"
         
         flight_insert_query = f"UPDATE flights SET booked_seats = booked_seats + {{'{booking.seat_number}'}}, capacity = {result.capacity - 1} WHERE flight_id = {booking.flight_id}"

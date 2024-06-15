@@ -18,12 +18,12 @@ export class BookingsServiceService {
     return this.httpClinet.get<Booking[]>(`${API_URL}/bookings/${flightId}`);
   }
 
-  addBooking(booking: AddBooking): Observable<AddBooking> {
-    return this.httpClinet.post<AddBooking>(`${API_URL}/bookings?flight_id=${booking.flight_id}&num_seats=${booking.num_seats}`, booking.passenger_names);
+  addBooking(booking: AddBooking[]): Observable<AddBooking[]> {
+    return this.httpClinet.post<AddBooking[]>(`${API_URL}/bookings`, booking);
   }
 
   updateBooking(bookingId: string, newFlightId: string): Observable<Booking> {
-    return this.httpClinet.put<Booking>(`${API_URL}/bookings/${bookingId}?bookId=${bookingId}&flightId=${newFlightId}`, null);
+    return this.httpClinet.put<Booking>(`${API_URL}/bookings/${bookingId}?bookingId=${bookingId}&flightId=${newFlightId}`, null);
   }
 
   deleteBooking(bookingId: string): Observable<Booking> {
