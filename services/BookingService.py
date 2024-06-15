@@ -61,7 +61,6 @@ class BookingService:
                     booked_seats = booked_seats.union({seat})
                     capacity -= 1
                     session.execute(update_flight_query, (booked_seats, capacity))
-                    passenger_name = passenger_names.pop(0)
                     session.execute(insert_booking_query, (booking_id, passenger_name, seat))
                     given_seats.append(seat)
         if len(passenger_names) < starting_len:
