@@ -1,1 +1,14 @@
-<p>flights</p>
+<mat-card *ngFor="let flight of flights" class="my-3">
+    <mat-card-header>
+        <mat-card-title>{{flight.departure_airport}} - {{flight.arrival_airport}}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <p>{{flight.capacity}} free places</p>
+        <p>Departure time: {{flight.departure_time | date: 'YYYY-MM-dd HH:mm'}}</p>
+        <p>Arrival time: {{flight.arrival_time | date: 'YYYY-MM-dd HH:mm'}}</p>
+    </mat-card-content>
+    <mat-card-actions>
+        <a class="btn btn-secondary" [routerLink]="flight.flight_id">Details</a>
+        <a class="btn btn-primary" style="margin-left: .5rem;" routerLink="../bookings/add/{{flight.flight_id}}">Book ticket</a>
+    </mat-card-actions>
+</mat-card>

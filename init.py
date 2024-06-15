@@ -9,7 +9,8 @@ class Init:
         if keyspace_name not in session.cluster.metadata.keyspaces:
             self.create_keyspace(keyspace_name)
             print(f'Created {keyspace_name} keyspace')
-        session.cluster.connect(keyspace_name)
+        query = f"USE {keyspace_name};"
+        session.execute(query)
         print(f'Connected to {keyspace_name} keyspace')
         self.create_tables()
         self.seed_data()
@@ -19,6 +20,7 @@ class Init:
     def create_keyspace(self, keyspace_name='flights_system'):
         query = f"CREATE KEYSPACE IF NOT EXISTS {keyspace_name}" + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '2'};"
         session.execute(query)
+        session.set_keyspace(keyspace_name)
 
     def create_tables(self):
         create_flights_table_query = """

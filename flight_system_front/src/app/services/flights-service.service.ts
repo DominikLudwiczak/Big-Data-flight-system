@@ -13,7 +13,19 @@ export class FlightsServiceService {
 
   constructor(private httpClinet: HttpClient) { }
 
-  getFlights(): Observable<any> {
-    return this.httpClinet.get<any>(`${API_URL}/flights`);
+  getFlights(): Observable<Flight[]> {
+    return this.httpClinet.get<Flight[]>(`${API_URL}/flights`);
+  }
+
+  getFlight(flightId: string): Observable<Flight> {
+    return this.httpClinet.get<Flight>(`${API_URL}/flights/${flightId}`);
+  }
+
+  addFlight(flight: Flight): Observable<Flight> {
+    return this.httpClinet.post<Flight>(`${API_URL}/flights`, flight);
+  }
+
+  deleteFlight(flightId: string): Observable<Flight> {
+    return this.httpClinet.delete<Flight>(`${API_URL}/flights/${flightId}`);
   }
 }

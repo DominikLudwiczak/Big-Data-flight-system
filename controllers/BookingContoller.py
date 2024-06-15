@@ -19,9 +19,5 @@ def deleteBooking(bookId: uuid.UUID):
     service.deleteBooking(bookId)
 
 @router.put("/{bookId}")
-def updateBooking(bookingId: uuid.UUID, flightId: uuid.UUID):
-    service.updateBooking(bookingId, flightId)
-
-@router.get("/")
-def getAllBookings():
-    return service.getAllBookings()
+def updateBooking(bookId: uuid.UUID, flightId: uuid.UUID):
+    service.updateBooking(bookId, flightId)

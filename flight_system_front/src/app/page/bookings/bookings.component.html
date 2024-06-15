@@ -1,0 +1,12 @@
+<a class="btn btn-primary" routerLink="../../../flights/{{flightId}}">Back</a>
+<a class="btn btn-primary" style="margin-left: .5rem;" routerLink="../../add/{{flightId}}">Book ticket</a>
+
+<mat-card *ngFor="let booking of bookings" class="my-3">
+    <mat-card-header>
+        <mat-card-title>{{booking.passenger_name}} / {{booking.seat_number}}</mat-card-title>
+    </mat-card-header>
+    <mat-card-actions>
+        <button class="btn btn-primary" routerLink="../../edit/{{booking.booking_id}}">Edit</button>
+        <button class="btn btn-danger" style="margin-left: .5rem;" (click)="deleteBooking(booking.booking_id)">Delete</button>
+    </mat-card-actions>
+</mat-card>
