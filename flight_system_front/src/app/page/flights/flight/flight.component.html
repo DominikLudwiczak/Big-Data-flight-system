@@ -1,1 +1,19 @@
-<p>flight works!</p>
+<a class="btn btn-primary mb-3" routerLink="../">Back</a>
+
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>{{flight.departure_airport}} - {{flight.arrival_airport}}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <p>Departure time: {{flight.departure_time | date: 'YYYY-MM-dd HH:mm'}}</p>
+        <p>Arrival time: {{flight.arrival_time | date: 'YYYY-MM-dd HH:mm'}}</p>
+        <p>Taken seats:</p>
+        <span *ngFor="let taken of flight.booked_seats">
+            {{taken}}
+        </span>
+    </mat-card-content>
+    <mat-card-actions>
+        <a class="btn btn-secondary" routerLink="../../bookings/flight/{{flight.flight_id}}">Show bookings</a>
+        <a class="btn btn-primary" style="margin-left: .5rem;" routerLink="../../bookings/add/{{flight.flight_id}}">Book ticket</a>
+    </mat-card-actions>
+</mat-card>

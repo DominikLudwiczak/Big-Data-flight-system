@@ -4,7 +4,9 @@ import uuid
 
 
 class BookingService:
-
+    def __init__(self) -> None:
+        session.execute("USE flights_system;")
+        
     def addBooking(self, flight_id, num_seats, passenger_names):
         starting_len = len(passenger_names)
         available_seats_query = f"SELECT booked_seats, capacity FROM flights WHERE flight_id = {flight_id}"
@@ -54,13 +56,11 @@ class BookingService:
                 if capacity == 0 or not passenger_names:
                     break
                 if seat not in booked_seats:
-                    print(seat)
                     booking_id = uuid.uuid4()
                     passenger_name = passenger_names.pop(0)
                     booked_seats = booked_seats.union({seat})
                     capacity -= 1
                     session.execute(update_flight_query, (booked_seats, capacity))
-                    passenger_name = passenger_names.pop(0)
                     session.execute(insert_booking_query, (booking_id, passenger_name, seat))
                     given_seats.append(seat)
         if len(passenger_names) < starting_len:

@@ -1,0 +1,16 @@
+<a class="btn btn-primary mb-3" (click)="goBack()">Back</a>
+
+<form [formGroup]="bookingForm" class=" form-group col-md-6">
+    <div class="input-group mb-3">
+        <input type="number" class="form-control" formControlName="num_seats" placeholder="Number of seats" aria-label="Number of seats" aria-describedby="button-addon2">
+        <button class="btn btn-outline-secondary" (click)="addPassengers()" type="button" id="button-addon2">Add passengers</button>
+    </div>
+
+    <div formArrayName="passenger_names">
+        <div *ngFor="let passenger of passengerNames.controls; let i = index;">
+            <input class="form-control my-2" [formControlName]="i" type="text" placeholder="First & Last Name">
+        </div>
+    </div>
+    
+    <button class="btn btn-success" (click)="addBooking()" [disabled]="!bookingForm.valid">Add booking</button>
+</form>

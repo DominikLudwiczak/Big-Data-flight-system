@@ -4,6 +4,8 @@ from datetime import datetime
 from cassandra.query import BatchStatement, SimpleStatement
 
 class FlightService:
+    def __init__(self) -> None:
+        session.execute("USE flights_system;")
 
     def getFlight(self, flightId):
         result = session.execute(f"SELECT * FROM flights WHERE flight_id = {flightId}").one()
