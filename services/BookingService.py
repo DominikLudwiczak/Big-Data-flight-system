@@ -88,7 +88,7 @@ class BookingService:
         update_seats_query = f"UPDATE flights SET booked_seats = booked_seats - {{'{seat_number}'}}, capacity = {capacity + 1} WHERE flight_id = {flight_id}"
         session.execute(update_seats_query)
         
-        return True, f"Booking {booking_id} removed, seat {seat_number} freed"
+        return f"Booking {booking_id} removed, seat {seat_number} freed"
 
     def updateBooking(self, booking_id, flight_id):
         booking_query = f"SELECT flight_id, passenger_name, seat_number FROM bookings WHERE booking_id = {booking_id}"
@@ -103,7 +103,7 @@ class BookingService:
 
         result = self.addBooking(flight_id, 1, [passenger_name])
         if not result:
-            return False, "No seats left on selected flight"
+            return "No seats left on selected flight"
 
         self.deleteBooking(booking_id)
 
@@ -120,7 +120,7 @@ class BookingService:
     def getBookingById(self, booking_id):
         result = session.execute(f"SELECT * FROM bookings WHERE booking_id = {booking_id}").one()
         if not result:
-            return False, None
+            return None
         return Booking.to_json(result.flight_id, result.booking_id, result.passenger_name, result.seat_number)
     
     def getAllBookings(self):
@@ -134,9 +134,9 @@ class BookingService:
         select_query = f"SELECT capacity, booked_seats FROM flights WHERE flight_id = {booking.flight_id}"
         result = session.execute(select_query).one()
         if not result:
-            return False, "Flight not found"
+            return "Flight not found"
         if booking.seat_number in result.booked_seats:
-            return False, "Seat already booked"
+            return "Seat already booked"
         
         insert_query = session.prepare("""
             INSERT INTO bookings (booking_id, flight_id, passenger_name, seat_number)
